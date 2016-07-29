@@ -39,3 +39,14 @@ type GraphNodeTargetable interface {
 
 	SetTargets([]ResourceAddress)
 }
+
+// GraphNodeRemoveIfNotTargetedable is a special interface for graph nodes that
+// aren't directly addressable, but need to be removed from the graph when they
+// are not targeted. (Nodes that are not directly targeted end up in the set of
+// targeted nodes because something that _is_ targeted depends on them.) The
+// initial use case for this interface is GraphNodeConfigVariable, which was
+// having trouble interpolating for module variables in targeted scenarios that
+// filtered out the resource node being referenced.
+type GraphNodeRemoveIfNotTargetedable interface {
+	RemoveIfNotTargeted() bool
+}

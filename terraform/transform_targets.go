@@ -37,11 +37,16 @@ func (t *TargetsTransformer) Transform(g *Graph) error {
 		}
 
 		for _, v := range g.Vertices() {
+			removable := false
 			if _, ok := v.(GraphNodeAddressable); ok {
-				if !targetedNodes.Include(v) {
-					log.Printf("[DEBUG] Removing %q, filtered by targeting.", dag.VertexName(v))
-					g.Remove(v)
-				}
+				removable = true
+			}
+			if vr, ok := v.(GraphNodeRemoveIfNotTargetedable); ok {
+				removable = vr.RemoveIfNotTargeted()
+			}
+			if removable && !targetedNodes.Include(v) {
+				log.Printf("[DEBUG] Removing %q, filtered by targeting.", dag.VertexName(v))
+				g.Remove(v)
 			}
 		}
 	}
